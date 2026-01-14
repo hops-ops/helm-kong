@@ -1,0 +1,40 @@
+# code: language=yaml
+#
+# Helm release for Kong
+#
+# Kong is a cloud-native API gateway and ingress controller built on top
+# of a lightweight proxy. It provides traffic management, security, and
+# observability for microservices and APIs.
+#
+
+{{- $kg := $state.kong }}
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $kg.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-kong" }}
+  labels: {{ $kg.labels | toJson }}
+spec:
+  managementPolicies: {{ $kg.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: kong
+      repository: https://charts.konghq.com
+      version: 3.0.2
+    namespace: {{ $kg.namespace }}
+    {{- if $kg.overrideAllValues }}
+    values:
+      {{- toYaml $kg.overrideAllValues | nindent 6 }}
+    {{- else }}
+    {{- $defaultValues := dict "ingressController" (dict "enabled" $kg.ingressController) }}
+    {{- $mergedValues := merge $kg.values $defaultValues }}
+    values:
+      {{- toYaml $mergedValues | nindent 6 }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $kg.providerConfigRef.name }}
+    kind: {{ $kg.providerConfigRef.kind }}

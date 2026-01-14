@@ -1,0 +1,5 @@
+apiVersion: v2
+name: helm-kong
+version: 0.0.0
+description: GitOps packaging for the kong Crossplane configuration
+appVersion: 3.0.2

@@ -1,0 +1,19 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: Kong
+metadata:
+  name: kong
+  namespace: example-env
+spec:
+  clusterName: example-cluster
+  namespace: kong
+  ingressController: true
+  labels:
+    team: platform
+    environment: staging
+  values:
+    proxy:
+      type: LoadBalancer
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "512Mi"
